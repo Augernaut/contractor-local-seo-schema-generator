@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contractor Local SEO Schema Generator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+ 
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #222222;
+    --accent: #e87400;
+    --accent-dim: #7a3e00;
+    --text: #e8e8e8;
+    --text-dim: #666666;
+    --text-mid: #999999;
+    --green: #00c853;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+ 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+ 
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+ 
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 32px;
+    margin-bottom: 40px;
+  }
+ 
+  .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+ 
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+ 
+  .subtitle {
+    font-size: 15px;
+    color: var(--text-mid);
+    line-height: 1.6;
+    max-width: 600px;
+  }
+ 
+  .subtitle a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+ 
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+ 
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+ 
+  .full { grid-column: 1 / -1; }
+ 
+  @media (max-width: 600px) {
+    .grid, .grid-3 { grid-template-columns: 1fr; }
+  }
+ 
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin-bottom: 16px;
+  }
+ 
+  .section-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+ 
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+ 
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 0;
+  }
+ 
+  label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+ 
+  input, select, textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+ 
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+  }
+ 
+  select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+ 
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-size: 13px;
+  }
+ 
+  .checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+    margin-top: 4px;
+  }
+ 
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+ 
+  .checkbox-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    padding: 0;
+    cursor: pointer;
+    accent-color: var(--accent);
+  }
+ 
+  .checkbox-item span {
+    font-size: 13px;
+    color: var(--text-mid);
+    line-height: 1;
+  }
+ 
+  .generate-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 16px 32px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.15s;
+    margin-top: 8px;
+  }
+ 
+  .generate-btn:hover { background: #cc6600; }
+ 
+  .output-section {
+    margin-top: 24px;
+    display: none;
+  }
+ 
+  .output-section.visible { display: block; }
+ 
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    padding: 14px 20px;
+  }
+ 
+  .output-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+ 
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+ 
+  .copy-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+ 
+  .copy-btn.copied {
+    border-color: var(--green);
+    color: var(--green);
+  }
+ 
+  .output-code {
+    background: #050505;
+    border: 1px solid var(--border);
+    padding: 24px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.7;
+    color: #ccc;
+    overflow-x: auto;
+    white-space: pre;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+ 
+  .install-note {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    padding: 20px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text-mid);
+    line-height: 1.7;
+  }
+ 
+  .install-note strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+ 
+  .install-note code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--bg);
+    padding: 2px 6px;
+    color: var(--accent);
+  }
+ 
+  .powered-by {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+ 
+  .powered-by a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+ 
+  <header>
+    <div class="label">Free Tool — contractor-local-seo-schema-generator</div>
+    <h1>LocalBusiness Schema Generator<br>for Home Service Contractors</h1>
+    <p class="subtitle">Generate valid JSON-LD structured data for your contractor website. Paste it into your <code style="font-family:monospace;color:var(--accent)">&lt;head&gt;</code> tag to help Google understand your business and improve Map Pack rankings. Built by <a href="https://augernaut.com" target="_blank">Augernaut</a> — <a href="https://augernaut.com/google-business-profile/" target="_blank">contractor marketing agency</a>.</p>
+  </header>
+ 
+  <div class="section">
+    <div class="section-title">Business Info</div>
+    <div class="grid">
+      <div class="field">
+        <label>Business Name</label>
+        <input type="text" id="bizName" placeholder="Clog Hunter Plumbing">
+      </div>
+      <div class="field">
+        <label>Business Type</label>
+        <select id="bizType">
+          <option value="Plumber">Plumber</option>
+          <option value="HVACContractor">HVAC Contractor</option>
+          <option value="RoofingContractor">Roofing Contractor</option>
+          <option value="GeneralContractor">General Contractor</option>
+          <option value="Electrician">Electrician</option>
+          <option value="HomeAndConstructionBusiness">Home Services</option>
+          <option value="LocalBusiness">Other Local Business</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Phone Number</label>
+        <input type="text" id="phone" placeholder="+19185551234">
+      </div>
+      <div class="field">
+        <label>Website URL</label>
+        <input type="text" id="url" placeholder="https://yourbusiness.com">
+      </div>
+      <div class="field full">
+        <label>Business Description</label>
+        <textarea id="description" placeholder="Licensed plumber serving Tahlequah and surrounding areas. Emergency drain cleaning, water heater repair, and sewer line replacement."></textarea>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="section">
+    <div class="section-title">Location</div>
+    <div class="grid">
+      <div class="field">
+        <label>Street Address</label>
+        <input type="text" id="street" placeholder="123 Main St">
+      </div>
+      <div class="field">
+        <label>City</label>
+        <input type="text" id="city" placeholder="Tahlequah">
+      </div>
+      <div class="field">
+        <label>State</label>
+        <input type="text" id="state" placeholder="OK">
+      </div>
+      <div class="field">
+        <label>Zip Code</label>
+        <input type="text" id="zip" placeholder="74464">
+      </div>
+    </div>
+  </div>
+ 
+  <div class="section">
+    <div class="section-title">Service Area</div>
+    <div class="grid">
+      <div class="field full">
+        <label>Cities / Zip Codes Served (comma separated)</label>
+        <input type="text" id="serviceArea" placeholder="Tahlequah, Muskogee, Wagoner, Stilwell, Sallisaw">
+      </div>
+    </div>
+  </div>
+ 
+  <div class="section">
+    <div class="section-title">Services Offered</div>
+    <div class="field full">
+      <div class="checkbox-group" id="serviceCheckboxes">
+        <label class="checkbox-item"><input type="checkbox" value="Drain Cleaning"> <span>Drain Cleaning</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="Emergency Plumbing"> <span>Emergency Plumbing</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="Water Heater Repair"> <span>Water Heater Repair</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="Water Heater Installation"> <span>Water Heater Installation</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="Sewer Line Repair"> <span>Sewer Line Repair</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="Sewer Line Replacement"> <span>Sewer Line Replacement</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="Septic Tank Pumping"> <span>Septic Tank Pumping</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="Septic System Repair"> <span>Septic System Repair</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="AC Repair"> <span>AC Repair</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="AC Installation"> <span>AC Installation</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="Furnace Repair"> <span>Furnace Repair</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="HVAC Maintenance"> <span>HVAC Maintenance</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="Roof Repair"> <span>Roof Repair</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="Roof Replacement"> <span>Roof Replacement</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="Gutter Installation"> <span>Gutter Installation</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="Electrical Panel Upgrade"> <span>Electrical Panel Upgrade</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="Outlet Installation"> <span>Outlet Installation</span></label>
+        <label class="checkbox-item"><input type="checkbox" value="Pipe Repair"> <span>Pipe Repair</span></label>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="section">
+    <div class="section-title">Reviews (Optional)</div>
+    <div class="grid-3">
+      <div class="field">
+        <label>Average Rating</label>
+        <input type="number" id="rating" placeholder="4.9" min="1" max="5" step="0.1">
+      </div>
+      <div class="field">
+        <label>Review Count</label>
+        <input type="number" id="reviewCount" placeholder="87">
+      </div>
+      <div class="field">
+        <label>Review Source</label>
+        <select id="reviewSource">
+          <option value="Google">Google</option>
+          <option value="Yelp">Yelp</option>
+          <option value="Facebook">Facebook</option>
+        </select>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="section">
+    <div class="section-title">Business Hours</div>
+    <div class="grid">
+      <div class="field">
+        <label>Weekday Hours</label>
+        <input type="text" id="weekdayHours" placeholder="Mo-Fr 07:00-18:00">
+      </div>
+      <div class="field">
+        <label>Weekend Hours (leave blank if closed)</label>
+        <input type="text" id="weekendHours" placeholder="Sa 08:00-14:00">
+      </div>
+    </div>
+  </div>
+ 
+  <button class="generate-btn" onclick="generateSchema()">Generate Schema Code →</button>
+ 
+  <div class="output-section" id="outputSection">
+    <div class="output-header">
+      <span class="output-title">JSON-LD Schema — Ready to Install</span>
+      <button class="copy-btn" id="copyBtn" onclick="copySchema()">Copy Code</button>
+    </div>
+    <div class="output-code" id="outputCode"></div>
+    <div class="install-note">
+      <strong>How to install:</strong> Copy the code above and paste it inside the <code>&lt;head&gt;</code> tag of your website. On WordPress, use a plugin like <strong>WPCode</strong> — add a new snippet, set type to HTML, paste the code, and set it to run on all pages. <br><br>
+      Need help with local SEO for your contracting business? <a href="https://augernaut.com/google-business-profile/" target="_blank" style="color:var(--accent)">Augernaut manages GBP and local SEO for home service contractors.</a>
+    </div>
+  </div>
+ 
+  <div class="powered-by">
+    Built and maintained by <a href="https://augernaut.com" target="_blank">Augernaut</a> — <a href="https://augernaut.com/google-ads-management/" target="_blank">Google Ads management</a>, <a href="https://augernaut.com/google-business-profile/" target="_blank">GBP management</a>, and <a href="https://augernaut.com/seo/" target="_blank">local SEO for contractors</a>. Free to use. MIT license.
+  </div>
+ 
+</div>
+ 
+<script>
+function generateSchema() {
+  const name = document.getElementById('bizName').value || 'Your Business Name';
+  const type = document.getElementById('bizType').value;
+  const phone = document.getElementById('phone').value;
+  const url = document.getElementById('url').value;
+  const description = document.getElementById('description').value;
+  const street = document.getElementById('street').value;
+  const city = document.getElementById('city').value;
+  const state = document.getElementById('state').value;
+  const zip = document.getElementById('zip').value;
+  const serviceArea = document.getElementById('serviceArea').value;
+  const rating = document.getElementById('rating').value;
+  const reviewCount = document.getElementById('reviewCount').value;
+  const reviewSource = document.getElementById('reviewSource').value;
+  const weekdayHours = document.getElementById('weekdayHours').value;
+  const weekendHours = document.getElementById('weekendHours').value;
+ 
+  const checkedServices = Array.from(
+    document.querySelectorAll('#serviceCheckboxes input[type="checkbox"]:checked')
+  ).map(cb => cb.value);
+ 
+  const schema = { "@context": "https://schema.org" };
+  schema["@type"] = type;
+  schema["@id"] = url ? url + "/#business" : "#business";
+  schema.name = name;
+  if (url) schema.url = url;
+  if (phone) schema.telephone = phone;
+  if (description) schema.description = description;
+ 
+  if (street || city || state || zip) {
+    schema.address = { "@type": "PostalAddress" };
+    if (street) schema.address.streetAddress = street;
+    if (city) schema.address.addressLocality = city;
+    if (state) schema.address.addressRegion = state;
+    if (zip) schema.address.postalCode = zip;
+    schema.address.addressCountry = "US";
+  }
+ 
+  if (serviceArea) {
+    const areas = serviceArea.split(',').map(s => s.trim()).filter(Boolean);
+    schema.areaServed = areas.map(area => ({ "@type": "City", "name": area }));
+  }
+ 
+  if (checkedServices.length > 0) {
+    schema.hasOfferCatalog = {
+      "@type": "OfferCatalog",
+      name: name + " Services",
+      itemListElement: checkedServices.map(s => ({
+        "@type": "Offer",
+        itemOffered: { "@type": "Service", name: s }
+      }))
+    };
+  }
+ 
+  if (rating && reviewCount) {
+    schema.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: rating,
+      reviewCount: reviewCount,
+      bestRating: "5",
+      worstRating: "1"
+    };
+  }
+ 
+  const hours = [];
+  if (weekdayHours) hours.push(weekdayHours);
+  if (weekendHours) hours.push(weekendHours);
+  if (hours.length > 0) schema.openingHours = hours;
+ 
+  const output = `<script type="application/ld+json">\n${JSON.stringify(schema, null, 2)}\n<\/script>`;
+  document.getElementById('outputCode').textContent = output;
+  document.getElementById('outputSection').classList.add('visible');
+  document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+ 
+function copySchema() {
+  const code = document.getElementById('outputCode').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied ✓';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy Code';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+</script>
+</body>
+</html>
